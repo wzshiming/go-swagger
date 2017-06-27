@@ -83,13 +83,40 @@ func GB(rootapi *swagger.Swagger, curpath string) {
 	}
 
 	for k, v := range m {
-		//typ := controllers.Child(k)
-		// ff.Print(typ.Pos(), typ.Tars())
+		typ := controllers.Child(k)
+
+		t := typ.Tars()
+
+		rou := ""
+		if len(t) >= 3 {
+			cg := t[3].(*ast.GenDecl)
+			typdoc := cg.Doc.Text()
+
+			d := ParseAtRows(typdoc)
+
+			//ffmt.Puts(fun.Decl)
+
+			if len(d["router"]) != 0 {
+				rou = d["router"][0]
+			}
+
+			des := ""
+			if len(d["description"]) != 0 {
+				des = d["description"][0]
+			}
+
+			rootapi.Tags = append(rootapi.Tags, swagger.Tag{
+				Name:        rou,
+				Description: des,
+			})
+		}
+		if rou == "" {
+			continue
+		}
+
 		for _, v2 := range v {
-			b := strings.TrimSuffix(k, "Controller")
-			b = "/" + strings.ToLower(b)
 			fun := controllers.Child(k + ":" + v2)
-			GenerateFunc(rootapi, controllers, b, fun.Doc().Text())
+			GenerateFunc(rootapi, controllers, rou, fun.Doc().Text())
 		}
 	}
 	//ffmt.Puts(m)
@@ -109,6 +136,10 @@ func GenerateSchema(typname string, node *gowalk.Node) (schema swagger.Schema, m
 		c := node.Child(v)
 		t := c.Type()
 		tn := t.Name()
+		if tn == "" {
+			continue
+		}
+
 		n, ok := basicTypes[tn]
 		// ffmt.Mark(t.Name())
 		if ok {
@@ -127,6 +158,7 @@ func GenerateSchema(typname string, node *gowalk.Node) (schema swagger.Schema, m
 			//			v := c.Child(t.Name())
 			//			ffmt.P(v.Pos(), t.Name())
 		}
+
 		//ffmt.Puts(c.Pos(), c.Name(), c.Type().Name(), c.Comment())
 	}
 
@@ -154,6 +186,10 @@ func GenerateFunc(rootapi *swagger.Swagger, node *gowalk.Node, baseurl string, f
 	met := ds[2]
 	k := baseurl + ur
 
+	if rootapi.Definitions == nil {
+		rootapi.Definitions = map[string]swagger.Schema{}
+	}
+
 	// 解析参数
 	pars := []swagger.Parameter{}
 	for _, v := range d["param"] {
@@ -162,9 +198,6 @@ func GenerateFunc(rootapi *swagger.Swagger, node *gowalk.Node, baseurl string, f
 			continue
 		}
 
-		if rootapi.Definitions == nil {
-			rootapi.Definitions = map[string]swagger.Schema{}
-		}
 		typname := ps[3]
 		tp := node.Child(typname)
 
@@ -210,33 +243,27 @@ func GenerateFunc(rootapi *swagger.Swagger, node *gowalk.Node, baseurl string, f
 	}
 
 	resps := map[string]swagger.Response{}
-	for _, v := range append(d["success"]) {
+	for _, v := range append(d["success"], d["failure"]...) {
 		d := parseResp.FindStringSubmatch(v)
-		if len(d) < 3 {
-			continue
+		rr := swagger.Response{}
+		if len(d) >= 3 {
+			rr.Description = d[2]
 		}
-		resps[d[1]] = swagger.Response{
-			Description: d[2],
-		}
-	}
+		if len(d) >= 4 {
+			typname := d[3]
+			tp := node.Child(typname)
 
-	for _, v := range append(d["failure"]) {
-		d := parseResp.FindStringSubmatch(v)
-		if len(d) < 3 {
-			continue
+			ms := ""
+			rootapi.Definitions[typname], ms = GenerateSchema(typname, tp)
+			if d[3] != "" {
+				rr.Schema = &swagger.Schema{
+					Ref: "#/definitions/" + d[3],
+				}
+			}
+			rr.Description += "<br/>" + ms
 		}
-		resps[d[1]] = swagger.Response{
-			Description: d[2],
-		}
-	}
-
-	for _, v := range append(d["failure"]) {
-		d := parseResp.FindStringSubmatch(v)
-		if len(d) < 3 {
-			continue
-		}
-		resps[d[1]] = swagger.Response{
-			Description: d[2],
+		if len(d) >= 2 {
+			resps[d[1]] = rr
 		}
 	}
 

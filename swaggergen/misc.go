@@ -41,7 +41,7 @@ var parseRouter = regexp.MustCompile(`(\S+)\s+\[(\w+)\]`)
 var parseParam = regexp.MustCompile(`(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+)`)
 
 // 解析出返回
-var parseResp = regexp.MustCompile(`(\S+)\s+(.+)`)
+var parseResp = regexp.MustCompile(`(\S+)\s+(\S+)\s*(\S*)`)
 
 // 正则出 每一行的数据
 func ParseAtRows(data string) map[string][]string {
