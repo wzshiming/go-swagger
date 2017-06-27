@@ -1,0 +1,21 @@
+
+# 接口文档页面
+#swagger:
+#  image: registry.cn-hangzhou.aliyuncs.com/wzshiming/swagger:latest
+#  # restart: always
+#  ports:
+#    - "8080:8080"
+#  volumes:
+#    - ./swagger.json:/etc/nginx/html/swagger.json:ro
+#    - ./swagger.yml:/etc/nginx/html/swagger.yml:ro
+
+swagger:
+  image: swaggerapi/swagger-ui:latest
+  # restart: always
+  ports:
+    - "8080:8080"
+  volumes:
+    - ./swagger.json:/usr/share/nginx/html/swagger.json:ro
+    - ./swagger.yml:/usr/share/nginx/html/swagger.yml:ro
+  environment:
+    - "SWAGGER_JSON=/foo/swagger.json"
