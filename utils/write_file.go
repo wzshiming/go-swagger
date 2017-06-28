@@ -14,7 +14,7 @@ func WriteFile(rootapi interface{}, basepath string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(filepath.Join(basepath, "swagger.json"), append(dt, '\n'), 0555)
+	err = ioutil.WriteFile(filepath.Join(basepath, "swagger.json"), append(dt, '\n'), 0666)
 	if err != nil {
 		return err
 	}
@@ -22,7 +22,7 @@ func WriteFile(rootapi interface{}, basepath string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filepath.Join(basepath, "swagger.yml"), dtyml, 0555)
+	err = ioutil.WriteFile(filepath.Join(basepath, "swagger.yml"), dtyml, 0666)
 	if err != nil {
 		return err
 	}
