@@ -6,29 +6,38 @@ import (
 )
 
 var basicTypes = map[string]string{
-	"bool":              "boolean::",
-	"uint":              "integer:int32:",
-	"uint8":             "integer:int32:",
-	"uint16":            "integer:int32:",
-	"uint32":            "integer:int32:",
-	"uint64":            "integer:int64:",
-	"int":               "integer:int64:",
-	"int8":              "integer:int32:",
-	"int16":             "integer:int32:",
-	"int32":             "integer:int32:",
-	"int64":             "integer:int64:",
-	"uintptr":           "integer:int64:",
-	"float32":           "number:float:",
-	"float64":           "number:double:",
-	"string":            "string::",
-	"complex64":         "number:float:",
-	"complex128":        "number:double:",
-	"byte":              "string:byte:",
-	"rune":              "string:byte:",
-	"time.Time":         "string::2006-01-02T15:04:05+08:00",
-	"time.Duration":     "integer:int64:",
-	"statuscode.Status": "integer:int64:",
-	"Money":             "integer:int64:",
+	"bool":       "boolean::",
+	"uint":       "integer:int32:",
+	"uint8":      "integer:int32:",
+	"uint16":     "integer:int32:",
+	"uint32":     "integer:int32:",
+	"uint64":     "integer:int64:",
+	"int":        "integer:int64:",
+	"int8":       "integer:int32:",
+	"int16":      "integer:int32:",
+	"int32":      "integer:int32:",
+	"int64":      "integer:int64:",
+	"uintptr":    "integer:int64:",
+	"float32":    "number:float:",
+	"float64":    "number:double:",
+	"string":     "string::",
+	"complex64":  "number:float:",
+	"complex128": "number:double:",
+	"byte":       "string:byte:",
+	"rune":       "string:byte:",
+	"Time":       "string::2006-01-02T15:04:05+08:00",
+	"Duration":   "integer:int64:",
+	"Status":     "integer:int64:",
+	"Money":      "integer:int64:",
+}
+
+func getBasicTypes(s string) (string, bool) {
+	d := strings.LastIndex(s, ".")
+	if d != -1 {
+		s = s[d+1:]
+	}
+	s, b := basicTypes[s]
+	return s, b
 }
 
 // 解析出有意义的一行

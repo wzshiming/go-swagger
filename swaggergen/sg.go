@@ -140,7 +140,7 @@ func GenerateSchema(typname string, node *gowalk.Node) (schema swagger.Schema, m
 			continue
 		}
 
-		n, ok := basicTypes[tn]
+		n, ok := getBasicTypes(tn)
 		// ffmt.Mark(t.Name())
 		if ok {
 			ct := strings.Replace(c.Comment().Text(), "\n", " ", -1)
