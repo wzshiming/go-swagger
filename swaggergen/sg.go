@@ -110,9 +110,10 @@ func GB(rootapi *swagger.Swagger, curpath string) {
 
 			if len(d["router"]) != 0 {
 				rou = d["router"][0]
-				if rou == "" {
-					continue
-				}
+			}
+
+			if rou == "" {
+				continue
 			}
 
 			des := ""
