@@ -108,10 +108,11 @@ func GB(rootapi *swagger.Swagger, curpath string) {
 
 			d := ParseAtRows(typdoc)
 
-			//ffmt.Puts(fun.Decl)
-
 			if len(d["router"]) != 0 {
 				rou = d["router"][0]
+				if rou == "" {
+					continue
+				}
 			}
 
 			des := ""
@@ -123,9 +124,6 @@ func GB(rootapi *swagger.Swagger, curpath string) {
 				Name:        rou,
 				Description: des,
 			})
-		}
-		if rou == "" {
-			continue
 		}
 
 		for _, v2 := range v {
