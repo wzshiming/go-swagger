@@ -4,6 +4,8 @@ import (
 	"go/ast"
 	"strings"
 
+	"sort"
+
 	"github.com/wzshiming/ffmt"
 	"github.com/wzshiming/go-swagger/swagger"
 	"github.com/wzshiming/gowalk"
@@ -82,7 +84,19 @@ func GB(rootapi *swagger.Swagger, curpath string) {
 		}
 	}
 
+	// 把类型键排序
+	so := []string{}
 	for k, v := range m {
+		_ = v
+		if k != "" {
+			so = append(so, k)
+		}
+	}
+	sort.Strings(so)
+
+	// 循环类型
+	for _, k := range so {
+		v := m[k]
 		typ := controllers.Child(k)
 
 		t := typ.Tars()
