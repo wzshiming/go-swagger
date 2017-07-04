@@ -51,6 +51,12 @@ func GenerateHead(rootapi *swagger.Swagger, comments []*ast.CommentGroup) (error
 				rootapi.Host = strings.TrimSpace(s[len("@Host"):])
 			} else if strings.HasPrefix(s, "@BasePath") {
 				rootapi.BasePath = strings.TrimSpace(s[len("@BasePath"):])
+			} else if strings.HasPrefix(s, "@DefineTypes") {
+				m := strings.TrimSpace(s[len("@DefineTypes"):])
+				n := strings.SplitN(m, " ", 2)
+				if len(n) == 2 {
+					basicTypes[n[0]] = strings.TrimSpace(n[1])
+				}
 			}
 		}
 	}
