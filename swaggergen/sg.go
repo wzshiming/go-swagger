@@ -64,9 +64,12 @@ func GenerateHead(rootapi *swagger.Swagger, comments []*ast.CommentGroup) (error
 	return
 }
 
-func GB(rootapi *swagger.Swagger, curpath string) {
-	routers := gowalk.NewWalk(curpath)
+func GB(rootapi *swagger.Swagger, rp, cp string) {
+	routers := gowalk.NewWalk(rp)
 
+	rootapi.Extensions = swagger.Extensions{
+		"Package": cp,
+	}
 	// 解析头
 	ps := routers.Value()
 	if sp, ok := ps.(map[string]*ast.Package); ok {
@@ -78,7 +81,7 @@ func GB(rootapi *swagger.Swagger, curpath string) {
 	}
 
 	// 解析内容
-	controllers := routers.Child("controllers")
+	controllers := gowalk.NewWalk(cp)
 	all := controllers.ChildList()
 	m := map[string][]string{}
 	for _, v := range all {
@@ -135,7 +138,7 @@ func GB(rootapi *swagger.Swagger, curpath string) {
 
 		for _, v2 := range v {
 			fun := controllers.Child(k + ":" + v2)
-			GenerateFunc(rootapi, controllers, rou, fun.Doc().Text())
+			GenerateFunc(rootapi, controllers, rou, fun.Doc().Text(), k, v2)
 		}
 	}
 	//ffmt.Puts(m)
@@ -185,11 +188,9 @@ func GenerateSchema(typname string, node *gowalk.Node) (schema swagger.Schema, m
 }
 
 // 解析函数
-func GenerateFunc(rootapi *swagger.Swagger, node *gowalk.Node, baseurl string, fundoc string) {
+func GenerateFunc(rootapi *swagger.Swagger, node *gowalk.Node, baseurl string, fundoc string, c, m string) {
 
 	d := ParseAtRows(fundoc)
-
-	//ffmt.Puts(fun.Decl)
 
 	rou := ""
 	if len(d["router"]) != 0 {
@@ -223,28 +224,6 @@ func GenerateFunc(rootapi *swagger.Swagger, node *gowalk.Node, baseurl string, f
 		ms := ""
 		rootapi.Definitions[typname], ms = GenerateSchema(typname, tp)
 
-		//		b := map[string]swagger.Propertie{}
-		//		tpcl := tp.ChildList()
-		//		for _, v := range tpcl {
-		//			c := tp.Child(v)
-		//			ffmt.Mark(c.Name())
-
-		//			b[c.Name()] = swagger.Propertie{
-		//				Type: "string",
-		//				//Format: "int64",
-		//			}
-		//		}
-
-		//		rootapi.Definitions[typname] = swagger.Schema{
-		//			//Ref         string               `json:"$ref,omitempty" yaml:"$ref,omitempty"`
-		//			Title: typname,
-		//			//Format      string               `json:"format,omitempty" yaml:"format,omitempty"`
-		//			//Description string               `json:"description,omitempty" yaml:"description,omitempty"`
-		//			//Required    []string             `json:"required,omitempty" yaml:"required,omitempty"`
-		//			Type: "object",
-		//			//Items       *Schema              `json:"items,omitempty" yaml:"items,omitempty"`
-		//			Properties: b,
-		//		}
 		par := swagger.Parameter{
 			In:          ps[1],
 			Name:        ps[2],
@@ -253,10 +232,6 @@ func GenerateFunc(rootapi *swagger.Swagger, node *gowalk.Node, baseurl string, f
 			Schema: &swagger.Schema{
 				Ref: "#/definitions/" + ps[3],
 			},
-			//Type: ps[3],
-			//	Format      string          `json:"format,omitempty" yaml:"format,omitempty"`
-			//	Items       *ParameterItems `json:"items,omitempty" yaml:"items,omitempty"`
-			//	Default     interface{}     `json:"default,omitempty" yaml:"default,omitempty"`
 		}
 		pars = append(pars, par)
 	}
@@ -312,12 +287,13 @@ func GenerateFunc(rootapi *swagger.Swagger, node *gowalk.Node, baseurl string, f
 		Summary:     summary,
 		Description: desc,
 		OperationID: k,
-		Consumes:    []string{"application/json"},
-		Produces:    []string{"application/json"},
-		//Schemes :    []string{},
-		Parameters: pars,
-		Responses:  resps,
-		Deprecated: deprecated == "true",
+		Parameters:  pars,
+		Responses:   resps,
+		Deprecated:  deprecated == "true",
+		Extensions: swagger.Extensions{
+			"Controllers": c,
+			"Methods":     m,
+		},
 	}
 
 	if rootapi.Paths == nil {

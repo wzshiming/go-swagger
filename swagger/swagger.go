@@ -29,42 +29,46 @@ type Swagger struct {
 	Security            map[string][]string `json:"security,omitempty" yaml:"security,omitempty"`
 	Tags                []Tag               `json:"tags,omitempty" yaml:"tags,omitempty"`
 	ExternalDocs        *ExternalDocs       `json:"externalDocs,omitempty" yaml:"externalDocs,omitempty"`
+	Extensions          Extensions          `json:"-" yaml:"-"`
 }
 
 // Information Provides metadata about the API. The metadata can be used by the clients if needed.
 type Information struct {
-	Title          string `json:"title,omitempty" yaml:"title,omitempty"`
-	Description    string `json:"description,omitempty" yaml:"description,omitempty"`
-	Version        string `json:"version,omitempty" yaml:"version,omitempty"`
-	TermsOfService string `json:"termsOfService,omitempty" yaml:"termsOfService,omitempty"`
-
-	Contact Contact  `json:"contact,omitempty" yaml:"contact,omitempty"`
-	License *License `json:"license,omitempty" yaml:"license,omitempty"`
+	Title          string     `json:"title,omitempty" yaml:"title,omitempty"`
+	Description    string     `json:"description,omitempty" yaml:"description,omitempty"`
+	Version        string     `json:"version,omitempty" yaml:"version,omitempty"`
+	TermsOfService string     `json:"termsOfService,omitempty" yaml:"termsOfService,omitempty"`
+	Contact        Contact    `json:"contact,omitempty" yaml:"contact,omitempty"`
+	License        *License   `json:"license,omitempty" yaml:"license,omitempty"`
+	Extensions     Extensions `json:"-" yaml:"-"`
 }
 
 // Contact information for the exposed API.
 type Contact struct {
-	Name  string `json:"name,omitempty" yaml:"name,omitempty"`
-	URL   string `json:"url,omitempty" yaml:"url,omitempty"`
-	EMail string `json:"email,omitempty" yaml:"email,omitempty"`
+	Name       string     `json:"name,omitempty" yaml:"name,omitempty"`
+	URL        string     `json:"url,omitempty" yaml:"url,omitempty"`
+	EMail      string     `json:"email,omitempty" yaml:"email,omitempty"`
+	Extensions Extensions `json:"-" yaml:"-"`
 }
 
 // License information for the exposed API.
 type License struct {
-	Name string `json:"name,omitempty" yaml:"name,omitempty"`
-	URL  string `json:"url,omitempty" yaml:"url,omitempty"`
+	Name       string     `json:"name,omitempty" yaml:"name,omitempty"`
+	URL        string     `json:"url,omitempty" yaml:"url,omitempty"`
+	Extensions Extensions `json:"-" yaml:"-"`
 }
 
 // Item Describes the operations available on a single path.
 type Item struct {
-	Ref     string     `json:"$ref,omitempty" yaml:"$ref,omitempty"`
-	Get     *Operation `json:"get,omitempty" yaml:"get,omitempty"`
-	Put     *Operation `json:"put,omitempty" yaml:"put,omitempty"`
-	Post    *Operation `json:"post,omitempty" yaml:"post,omitempty"`
-	Delete  *Operation `json:"delete,omitempty" yaml:"delete,omitempty"`
-	Options *Operation `json:"options,omitempty" yaml:"options,omitempty"`
-	Head    *Operation `json:"head,omitempty" yaml:"head,omitempty"`
-	Patch   *Operation `json:"patch,omitempty" yaml:"patch,omitempty"`
+	Ref        string     `json:"$ref,omitempty" yaml:"$ref,omitempty"`
+	Get        *Operation `json:"get,omitempty" yaml:"get,omitempty"`
+	Put        *Operation `json:"put,omitempty" yaml:"put,omitempty"`
+	Post       *Operation `json:"post,omitempty" yaml:"post,omitempty"`
+	Delete     *Operation `json:"delete,omitempty" yaml:"delete,omitempty"`
+	Options    *Operation `json:"options,omitempty" yaml:"options,omitempty"`
+	Head       *Operation `json:"head,omitempty" yaml:"head,omitempty"`
+	Patch      *Operation `json:"patch,omitempty" yaml:"patch,omitempty"`
+	Extensions Extensions `json:"-" yaml:"-"`
 }
 
 // Operation Describes a single API operation on a path.
@@ -79,6 +83,7 @@ type Operation struct {
 	Parameters  []Parameter         `json:"parameters,omitempty" yaml:"parameters,omitempty"`
 	Responses   map[string]Response `json:"responses,omitempty" yaml:"responses,omitempty"`
 	Deprecated  bool                `json:"deprecated,omitempty" yaml:"deprecated,omitempty"`
+	Extensions  Extensions          `json:"-" yaml:"-"`
 }
 
 // Parameter Describes a single operation parameter.
@@ -92,6 +97,7 @@ type Parameter struct {
 	Format      string          `json:"format,omitempty" yaml:"format,omitempty"`
 	Items       *ParameterItems `json:"items,omitempty" yaml:"items,omitempty"`
 	Default     interface{}     `json:"default,omitempty" yaml:"default,omitempty"`
+	Extensions  Extensions      `json:"-" yaml:"-"`
 }
 
 // A limited subset of JSON-Schema's items object. It is used by parameter definitions that are not located in "body".
@@ -101,7 +107,8 @@ type ParameterItems struct {
 	Format           string            `json:"format,omitempty" yaml:"format,omitempty"`
 	Items            []*ParameterItems `json:"items,omitempty" yaml:"items,omitempty"` //Required if type is "array". Describes the type of items in the array.
 	CollectionFormat string            `json:"collectionFormat,omitempty" yaml:"collectionFormat,omitempty"`
-	Default          string            `json:"default,omitempty" yaml:"default,omitempty"`
+	Default          interface{}       `json:"default,omitempty" yaml:"default,omitempty"`
+	Extensions       Extensions        `json:"-" yaml:"-"`
 }
 
 // Schema Object allows the definition of input and output data types.
@@ -114,6 +121,7 @@ type Schema struct {
 	Type        string               `json:"type,omitempty" yaml:"type,omitempty"`
 	Items       *Schema              `json:"items,omitempty" yaml:"items,omitempty"`
 	Properties  map[string]Propertie `json:"properties,omitempty" yaml:"properties,omitempty"`
+	Extensions  Extensions           `json:"-" yaml:"-"`
 }
 
 // Propertie are taken from the JSON Schema definition but their definitions were adjusted to the Swagger Specification
@@ -130,13 +138,15 @@ type Propertie struct {
 	Properties           map[string]Propertie `json:"properties,omitempty" yaml:"properties,omitempty"`
 	Items                *Propertie           `json:"items,omitempty" yaml:"items,omitempty"`
 	AdditionalProperties *Propertie           `json:"additionalProperties,omitempty" yaml:"additionalProperties,omitempty"`
+	Extensions           Extensions           `json:"-" yaml:"-"`
 }
 
 // Response as they are returned from executing this operation.
 type Response struct {
-	Description string  `json:"description,omitempty" yaml:"description,omitempty"`
-	Schema      *Schema `json:"schema,omitempty" yaml:"schema,omitempty"`
-	Ref         string  `json:"$ref,omitempty" yaml:"$ref,omitempty"`
+	Description string     `json:"description,omitempty" yaml:"description,omitempty"`
+	Schema      *Schema    `json:"schema,omitempty" yaml:"schema,omitempty"`
+	Ref         string     `json:"$ref,omitempty" yaml:"$ref,omitempty"`
+	Extensions  Extensions `json:"-" yaml:"-"`
 }
 
 // Security Allows the definition of a security scheme that can be used by the operations
@@ -149,6 +159,7 @@ type Security struct {
 	AuthorizationURL string            `json:"authorizationUrl,omitempty" yaml:"authorizationUrl,omitempty"`
 	TokenURL         string            `json:"tokenUrl,omitempty" yaml:"tokenUrl,omitempty"`
 	Scopes           map[string]string `json:"scopes,omitempty" yaml:"scopes,omitempty"` // The available scopes for the OAuth2 security scheme.
+	Extensions       Extensions        `json:"-" yaml:"-"`
 }
 
 // Tag Allows adding meta data to a single tag that is used by the Operation Object
@@ -156,10 +167,14 @@ type Tag struct {
 	Name         string        `json:"name,omitempty" yaml:"name,omitempty"`
 	Description  string        `json:"description,omitempty" yaml:"description,omitempty"`
 	ExternalDocs *ExternalDocs `json:"externalDocs,omitempty" yaml:"externalDocs,omitempty"`
+	Extensions   Extensions    `json:"-" yaml:"-"`
 }
 
 // ExternalDocs include Additional external documentation
 type ExternalDocs struct {
-	Description string `json:"description,omitempty" yaml:"description,omitempty"`
-	URL         string `json:"url,omitempty" yaml:"url,omitempty"`
+	Description string     `json:"description,omitempty" yaml:"description,omitempty"`
+	URL         string     `json:"url,omitempty" yaml:"url,omitempty"`
+	Extensions  Extensions `json:"-" yaml:"-"`
 }
+
+type Extensions map[string]interface{}
