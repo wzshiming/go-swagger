@@ -2,11 +2,12 @@ package swaggergen
 
 import (
 	"go/ast"
+	"path"
 	"strings"
 
 	"sort"
 
-	"github.com/wzshiming/ffmt"
+	"gopkg.in/ffmt.v1"
 	"github.com/wzshiming/go-swagger/swagger"
 	"github.com/wzshiming/gowalk"
 )
@@ -204,7 +205,7 @@ func GenerateFunc(rootapi *swagger.Swagger, node *gowalk.Node, baseurl string, f
 	}
 	ur := ds[1]
 	met := ds[2]
-	k := baseurl + ur
+	k := path.Join(baseurl, ur)
 
 	if rootapi.Definitions == nil {
 		rootapi.Definitions = map[string]swagger.Schema{}

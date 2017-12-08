@@ -14,7 +14,7 @@ func main() {
 	//		ffmt.Mark(err)
 	//		return
 	//	}
-	swaggergen.GB(rootapi, "wjs_api/routers")
+	swaggergen.GB(rootapi, "wjs_api/routers", "controllers")
 	//	err = generate.GenerateBody(rootapi, `wjs_api/controllers`)
 	//	if err != nil {
 	//		ffmt.Mark(err)
