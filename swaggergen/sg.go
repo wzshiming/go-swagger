@@ -7,9 +7,9 @@ import (
 
 	"sort"
 
-	"gopkg.in/ffmt.v1"
 	"github.com/wzshiming/go-swagger/swagger"
-	"github.com/wzshiming/gowalk"
+	"gopkg.in/ffmt.v1"
+	"gopkg.in/walk.v1"
 )
 
 var ff = ffmt.NewOptional(10, ffmt.StlyeP, ffmt.CanDefaultString|ffmt.CanFilterDuplicate|ffmt.CanRowSpan)
@@ -66,7 +66,7 @@ func GenerateHead(rootapi *swagger.Swagger, comments []*ast.CommentGroup) (error
 }
 
 func GB(rootapi *swagger.Swagger, rp, cp string) {
-	routers := gowalk.NewWalk(rp)
+	routers := walk.NewWalk(rp)
 
 	rootapi.Extensions = swagger.Extensions{
 		"Package": cp,
@@ -82,12 +82,12 @@ func GB(rootapi *swagger.Swagger, rp, cp string) {
 	}
 
 	// 解析内容
-	controllers := gowalk.NewWalk(cp)
+	controllers := walk.NewWalk(cp)
 	all := controllers.ChildList()
 	m := map[string][]string{}
 	for _, v := range all {
 		i := strings.Index(v, ":")
-		if i != -1 && gowalk.IsExported(v) {
+		if i != -1 && walk.IsExported(v) {
 			k2 := v[:i]
 			v2 := v[i+1:]
 			m[k2] = append(m[k2], v2)
@@ -146,7 +146,7 @@ func GB(rootapi *swagger.Swagger, rp, cp string) {
 
 }
 
-func GenerateSchema(typname string, node *gowalk.Node) (schema swagger.Schema, message string) {
+func GenerateSchema(typname string, node *walk.Node) (schema swagger.Schema, message string) {
 	if schema.Properties == nil {
 		schema.Properties = map[string]swagger.Propertie{}
 		schema.Title = typname
@@ -189,7 +189,7 @@ func GenerateSchema(typname string, node *gowalk.Node) (schema swagger.Schema, m
 }
 
 // 解析函数
-func GenerateFunc(rootapi *swagger.Swagger, node *gowalk.Node, baseurl string, fundoc string, c, m string) {
+func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fundoc string, c, m string) {
 
 	d := ParseAtRows(fundoc)
 
