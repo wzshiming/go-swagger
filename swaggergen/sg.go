@@ -13,6 +13,7 @@ import (
 )
 
 var ff = ffmt.NewOptional(10, ffmt.StlyeP, ffmt.CanDefaultString|ffmt.CanFilterDuplicate|ffmt.CanRowSpan)
+var mm = map[string]int{}
 
 func GenerateHead(rootapi *swagger.Swagger, comments []*ast.CommentGroup) (error error) {
 
@@ -177,7 +178,11 @@ func GenerateSchema(typname string, node *walk.Node) (schema swagger.Schema, mes
 
 			ms = append(ms, c.Name()+": "+ct)
 		} else {
-			ffmt.Mark("未定义类型", tn)
+
+			if mm[tn] == 0 {
+				ffmt.Mark("未定义类型", tn)
+			}
+			mm[tn]++
 			//			v := c.Child(t.Name())
 			//			ffmt.P(v.Pos(), t.Name())
 		}
