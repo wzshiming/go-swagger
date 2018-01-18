@@ -143,7 +143,6 @@ func GB(rootapi *swagger.Swagger, rp, cp string) {
 			GenerateFunc(rootapi, controllers, rou, fun.Doc().Text(), k, v2)
 		}
 	}
-	//ffmt.Puts(m)
 
 }
 
@@ -165,7 +164,6 @@ func GenerateSchema(typname string, node *walk.Node) (schema swagger.Schema, mes
 		}
 
 		n, ok := getBasicTypes(tn)
-		// ffmt.Mark(t.Name())
 		if ok {
 			ct := strings.Replace(c.Comment().Text(), "\n", " ", -1)
 			bb := strings.SplitN(n, ":", 3)
@@ -183,11 +181,7 @@ func GenerateSchema(typname string, node *walk.Node) (schema swagger.Schema, mes
 				ffmt.Mark("未定义类型", tn)
 			}
 			mm[tn]++
-			//			v := c.Child(t.Name())
-			//			ffmt.P(v.Pos(), t.Name())
 		}
-
-		//ffmt.Puts(c.Pos(), c.Name(), c.Type().Name(), c.Comment())
 	}
 
 	return schema, strings.Join(ms, "<br/>")
@@ -225,19 +219,26 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 		}
 
 		typname := ps[3]
+
 		tp := node.Child(typname)
 
 		ms := ""
-		rootapi.Definitions[typname], ms = GenerateSchema(typname, tp)
+
+		if IsExported(typname) {
+			rootapi.Definitions[typname], ms = GenerateSchema(typname, tp)
+		}
 
 		par := swagger.Parameter{
-			In:          ps[1],
-			Name:        ps[2],
+			Name:        ps[1],
+			In:          ps[2],
 			Description: ps[5] + "<br/>" + ms,
 			Required:    ps[4] == "true",
-			Schema: &swagger.Schema{
+		}
+
+		if IsExported(ps[3]) {
+			par.Schema = &swagger.Schema{
 				Ref: "#/definitions/" + ps[3],
-			},
+			}
 		}
 		pars = append(pars, par)
 	}
@@ -251,10 +252,15 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 		}
 		if len(d) >= 4 {
 			typname := d[3]
+
 			tp := node.Child(typname)
 
 			ms := ""
-			rootapi.Definitions[typname], ms = GenerateSchema(typname, tp)
+
+			if IsExported(typname) {
+				rootapi.Definitions[typname], ms = GenerateSchema(typname, tp)
+			}
+
 			if d[3] != "" {
 				rr.Schema = &swagger.Schema{
 					Ref: "#/definitions/" + d[3],
@@ -327,4 +333,9 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 		rootapi.Paths[k].Patch = ope
 	}
 	//ffmt.Puts(ds)
+}
+
+func IsExported(n string) bool {
+	pp := strings.SplitAfterN(n, ".", 2)
+	return ast.IsExported(pp[len(pp)-1])
 }
