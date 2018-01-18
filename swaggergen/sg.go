@@ -261,7 +261,7 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 				rootapi.Definitions[typname], ms = GenerateSchema(typname, tp)
 			}
 
-			if d[3] != "" {
+			if IsExported(d[3]) {
 				rr.Schema = &swagger.Schema{
 					Ref: "#/definitions/" + d[3],
 				}
