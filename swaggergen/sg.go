@@ -220,6 +220,12 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 
 		typname := ps[3]
 
+		isArray := false
+		if strings.HasPrefix(typname, "[]") {
+			typname = typname[2:]
+			isArray = true
+		}
+
 		tp := node.Child(typname)
 
 		ms := ""
@@ -235,9 +241,16 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 			Required:    ps[4] == "true",
 		}
 
-		if IsExported(ps[3]) {
+		if IsExported(typname) {
 			par.Schema = &swagger.Schema{
-				Ref: "#/definitions/" + ps[3],
+				Ref: "#/definitions/" + typname,
+			}
+
+			if isArray {
+				par.Schema = &swagger.Schema{
+					Items: par.Schema,
+					Type:  "array",
+				}
 			}
 		}
 		pars = append(pars, par)
@@ -246,12 +259,17 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 	resps := map[string]swagger.Response{}
 	for _, v := range append(d["success"], d["failure"]...) {
 		d := parseResp.FindStringSubmatch(v)
-		rr := swagger.Response{}
+		par := swagger.Response{}
 		if len(d) >= 3 {
-			rr.Description = d[2]
+			par.Description = d[2]
 		}
 		if len(d) >= 4 {
 			typname := d[3]
+			isArray := false
+			if strings.HasPrefix(typname, "[]") {
+				typname = typname[2:]
+				isArray = true
+			}
 
 			tp := node.Child(typname)
 
@@ -261,15 +279,24 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 				rootapi.Definitions[typname], ms = GenerateSchema(typname, tp)
 			}
 
-			if IsExported(d[3]) {
-				rr.Schema = &swagger.Schema{
-					Ref: "#/definitions/" + d[3],
+			if IsExported(typname) {
+
+				par.Schema = &swagger.Schema{
+					Ref: "#/definitions/" + typname,
 				}
+
+				if isArray {
+					par.Schema = &swagger.Schema{
+						Items: par.Schema,
+						Type:  "array",
+					}
+				}
+
 			}
-			rr.Description += "<br/>" + ms
+			par.Description += "<br/>" + ms
 		}
 		if len(d) >= 2 {
-			resps[d[1]] = rr
+			resps[d[1]] = par
 		}
 	}
 
