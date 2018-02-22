@@ -252,7 +252,12 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 					Type:  "array",
 				}
 			}
+		} else {
+			if par.Type == "" {
+				par.Type = "string"
+			}
 		}
+
 		pars = append(pars, par)
 	}
 
