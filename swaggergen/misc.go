@@ -48,6 +48,9 @@ var parseParam = regexp.MustCompile(`(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+)`)
 // 解析出返回
 var parseResp = regexp.MustCompile(`(\S+)\s+(\S+)\s*(\S*)`)
 
+// 匹配非单词
+var parseNonWord = regexp.MustCompile(`\W`)
+
 // 正则出 每一行的数据
 func ParseAtRows(data string) map[string][]string {
 

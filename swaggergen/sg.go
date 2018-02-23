@@ -325,12 +325,11 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 		deprecated = d["deprecated"][0]
 	}
 
-	//	ffmt.Puts(ps)
 	ope := &swagger.Operation{
 		Tags:        []string{baseurl},
 		Summary:     summary,
 		Description: desc,
-		OperationID: k,
+		OperationID: parseNonWord.ReplaceAllString(strings.Title(met+k), ""),
 		Parameters:  pars,
 		Responses:   resps,
 		Deprecated:  deprecated == "true",
