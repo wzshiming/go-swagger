@@ -230,8 +230,9 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 
 		ms := ""
 
+		defname := parseNonWord.ReplaceAllString(strings.Title(typname), "")
 		if IsExported(typname) {
-			rootapi.Definitions[typname], ms = GenerateSchema(typname, tp)
+			rootapi.Definitions[defname], ms = GenerateSchema(typname, tp)
 		}
 
 		par := swagger.Parameter{
@@ -243,7 +244,7 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 
 		if IsExported(typname) {
 			par.Schema = &swagger.Schema{
-				Ref: "#/definitions/" + typname,
+				Ref: "#/definitions/" + defname,
 			}
 
 			if isArray {
@@ -280,14 +281,15 @@ func GenerateFunc(rootapi *swagger.Swagger, node *walk.Node, baseurl string, fun
 
 			ms := ""
 
+			defname := parseNonWord.ReplaceAllString(strings.Title(typname), "")
 			if IsExported(typname) {
-				rootapi.Definitions[typname], ms = GenerateSchema(typname, tp)
+				rootapi.Definitions[defname], ms = GenerateSchema(typname, tp)
 			}
 
 			if IsExported(typname) {
 
 				par.Schema = &swagger.Schema{
-					Ref: "#/definitions/" + typname,
+					Ref: "#/definitions/" + defname,
 				}
 
 				if isArray {
