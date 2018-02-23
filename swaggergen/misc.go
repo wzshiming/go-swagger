@@ -25,6 +25,7 @@ var basicTypes = map[string]string{
 	"complex128": "number:double:",
 	"byte":       "string:byte:",
 	"rune":       "string:byte:",
+	"Time":       "string:date-time:2006-01-02T15:04:05+07:00",
 }
 
 func getBasicTypes(s string) (string, bool) {
