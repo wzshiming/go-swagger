@@ -12,7 +12,7 @@ import (
 	"gopkg.in/walk.v1"
 )
 
-var ff = ffmt.NewOptional(10, ffmt.StlyeP, ffmt.CanDefaultString|ffmt.CanFilterDuplicate|ffmt.CanRowSpan)
+var ff = ffmt.NewOptional(10, ffmt.StyleP, ffmt.CanDefaultString|ffmt.CanFilterDuplicate|ffmt.CanRowSpan)
 var mm = map[string]int{}
 
 func GenerateHead(rootapi *swagger.Swagger, comments []*ast.CommentGroup) (error error) {
