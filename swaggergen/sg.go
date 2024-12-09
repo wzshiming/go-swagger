@@ -8,8 +8,8 @@ import (
 	"sort"
 
 	"github.com/wzshiming/go-swagger/swagger"
+	"github.com/wzshiming/walk"
 	"gopkg.in/ffmt.v1"
-	"gopkg.in/walk.v1"
 )
 
 var ff = ffmt.NewOptional(10, ffmt.StyleP, ffmt.CanDefaultString|ffmt.CanFilterDuplicate|ffmt.CanRowSpan)
